@@ -24,9 +24,11 @@ export function calculate(operation: string): number {
     for (let i = 0; i < values.length; i++) {
       const curr = values[i];
       if (typeof curr === "string") {
-        const result = operations[curr](values[i-1] as number, values[i+1] as number);
-        values.splice(i-1, 3, result);
-        i--;
+        if (priorities[priorityIndex].includes(curr)) {
+          const result = operations[curr](values[i-1] as number, values[i+1] as number);
+          values.splice(i-1, 3, result);
+          i--;
+        }
       }
     }
   }

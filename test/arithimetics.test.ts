@@ -39,12 +39,20 @@ test("Division by zero should throw error", assert => {
   assert.throws(() => calculate("( 100 / 0 )"));
 });
 
-parametrisedTest("calculate result when operation have multiple number with same signal", testCalculate, 
+parametrisedTest("calculate result when operation has multiple number with same signal", testCalculate, 
   { input: "( 10 + 10 + 10 )", expected: 30 },
   { input: "( 5 + 10 + 10 + 40 )", expected: 65 },
   { input: "( 10 - 4 - 1 )", expected: 5 },
   { input: "( 10 * 2 * 2 * 10 )", expected: 400 },
   { input: "( 100 / 2 / 2 )", expected: 25 }
+);
+
+parametrisedTest("calculate result when operation has multiple numbers with different signals", testCalculate,
+  { input: "( 10 * 2 + 10 )", expected: 30 },
+  { input: "( 10 + 10 * 2 )", expected: 30 },
+  { input: "( 10 - 5 + 1 )", expected: 6 },
+  { input: "( 20 / 2 - 5 )", expected: 5 },
+  { input: "( 100 - 20 / 2 )", expected: 90 }
 );
 
 interface TestData<InputType, ExpectedType> {
