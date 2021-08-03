@@ -42,7 +42,9 @@ test("Division by zero should throw error", assert => {
 parametrisedTest("calculate result when operation have multiple number with same signal", testCalculate, 
   { input: "( 10 + 10 + 10 )", expected: 30 },
   { input: "( 5 + 10 + 10 + 40 )", expected: 65 },
-  { input: "( 10 - 4 - 1 )", expected: 5 }
+  { input: "( 10 - 4 - 1 )", expected: 5 },
+  { input: "( 10 * 2 * 2 * 10 )", expected: 400 },
+  { input: "( 100 / 2 / 2 )", expected: 25 }
 );
 
 interface TestData<InputType, ExpectedType> {
