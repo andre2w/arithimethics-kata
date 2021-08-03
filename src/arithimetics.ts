@@ -1,52 +1,46 @@
 const operations: Record<string, (left: number, right:number) => number> = {
   "+": (left: number, right: number) => left + right,
   "-": (left: number, right: number) => left - right,
-  "/": (left: number, right: number) => left / right,
+  "/": (left: number, right: number) => {
+    if (right === 0) throw new Error("Division by 0");
+    return left / right;
+  },
   "*": (left: number, right: number) => left * right,
 }
 
 const signals = new Set(["+", "-", "/", "*"]);
 
 export function calculate(operation: string): number {
-  if (operation.length === 3) {
-    return parseInt(operation.charAt(1));
-  }
+  const values: (number|string)[] = [];
 
-  let left: string = "";
-  let right: string = "";
-  let signal: string = "";
-
+  let currentValue = "";
   for (let i = 0; i < operation.length; i++) {
     const char = operation.charAt(i);
-    
-    if (!isValid(char)) {
-      continue;
-    }
 
-    if (!signals.has(char)) {
-      if (signal === "") {
-        left = left + char;
-      } else {
-        right = right + char;
+    if (signals.has(char) && operation.charAt(i+1) === " ") {
+      values.push(char);
+    } else if (char === " ") {
+      const value = parseInt(currentValue);
+      if (!isNaN(value)) {
+        values.push(value);
       }
-    } else {
-      signal = char;
+      currentValue = "";
+    } else if (char !== "(" && char !== ")") {
+      currentValue += char;
     }
   }
 
-  if (signal === "/" && parseInt(right) === 0) {
-    throw new Error("division by zero not allowed");
+  if (values.length === 1) {
+    return values[0] as number;
   }
-  return operations[signal](parseInt(left), parseInt(right));
-}
-
-
-function isValid(char: string): boolean {
-  const res = parseInt(char);
-
-  if (isNaN(res)) {
-    return signals.has(char);
+  
+  for (let i = 0; i < values.length; i++) {
+    const curr = values[i];
+    if (typeof curr === "string") {
+      const result = operations[curr](values[i-1] as number, values[i+1] as number);
+      values.splice(i-1, 3, result);
+      i--;
+    }
   }
-
-  return true;
+  return values[0] as number;
 }
