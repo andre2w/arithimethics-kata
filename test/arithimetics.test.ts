@@ -52,7 +52,16 @@ parametrisedTest("calculate result when operation has multiple numbers with diff
   { input: "( 10 + 10 * 2 )", expected: 30 },
   { input: "( 10 - 5 + 1 )", expected: 6 },
   { input: "( 20 / 2 - 5 )", expected: 5 },
-  { input: "( 100 - 20 / 2 )", expected: 90 }
+  { input: "( 100 - 20 / 2 )", expected: 90 },
+  { input: "( 10 + 10 / 2 * 5 )", expected: 35 },
+  { input: "( 10 - 10 / 2 * 5 + 5 )", expected: -10 },
+  { input: "( 1000 - 999 + 5000 )", expected: 5001 }
+);
+
+parametrisedTest("calculate result when you have a nested operation", testCalculate,
+  { input: "( 3 * ( 5 + 3 ) )", expected: 24 },
+  { input: "( 3 * ( 5 + 3 * ( 1 + 1 ) ) )", expected: 33 }
+
 );
 
 interface TestData<InputType, ExpectedType> {

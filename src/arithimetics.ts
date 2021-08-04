@@ -13,47 +13,85 @@ const signals = new Set(["+", "-", "/", "*"]);
 const priorities = [["*", "/"], ["+", "-"]];
 
 export function calculate(operation: string): number {
-  const values = parse(operation);
+  const values = parse(operation, 0);
 
   if (values.length === 1) {
     return values[0] as number;
   }
   
 
-  for (let priorityIndex = 0; priorityIndex < priorities.length; priorityIndex++) {
-    for (let i = 0; i < values.length; i++) {
-      const curr = values[i];
-      if (typeof curr === "string") {
-        if (priorities[priorityIndex].includes(curr)) {
-          const result = operations[curr](values[i-1] as number, values[i+1] as number);
-          values.splice(i-1, 3, result);
-          i--;
-        }
-      }
-    }
+  return calculateTotal(values);
+}
+
+type Operation<T> = (string | number | T)[];
+interface ParsedOperation extends Operation<ParsedOperation> {};
+
+function calculateTotal(values: ParsedOperation) {
+  for (const priority of priorities) {
+    calculateTotalForSymbols(values, priority);
   }
   return values[0] as number;
 }
 
-function parse(operation: string): (number|string)[] {
-  const values: (number|string)[] = [];
+function calculateTotalForSymbols(values: ParsedOperation, symbols: string[]) {
+  for (let i = 0; i < values.length; i++) {
+    const curr = values[i];
+
+    if (typeof curr === "string") {
+
+      if (symbols.includes(curr)) {
+        const left = getValue(values[i - 1]);
+        const right = getValue(values[i + 1]);
+        const result = operations[curr](left, right);
+        values.splice(i - 1, 3, result);
+        i--;
+      }
+
+    }
+  }
+}
+
+function parse(operation: string, startingIndex: number) {
+  const values: ParsedOperation = [];
 
   let currentValue = "";
-  for (let i = 0; i < operation.length; i++) {
+
+  for (let i = startingIndex; i < operation.length; i++) {
     const char = operation.charAt(i);
 
-    if (signals.has(char) && operation.charAt(i+1) === " ") {
+    if (isOperationSignal(char, operation.charAt(i + 1))) {
       values.push(char);
     } else if (char === " ") {
-      const value = parseInt(currentValue);
-      if (!isNaN(value)) {
-        values.push(value);
-      }
+      pushValue(currentValue, values);
       currentValue = "";
     } else if (char !== "(" && char !== ")") {
       currentValue += char;
+    } else if (char === "(" && i > startingIndex) {
+      const parsed = parse(operation, i);
+      values.push(parsed)
+    } else if (char === ")") {
+      return values;
     }
   }
 
   return values;
+}
+
+function pushValue(currentValue: string, values: ParsedOperation) {
+  const value = parseInt(currentValue);
+  if (Number.isInteger(value)) {
+    values.push(value);
+  }
+}
+
+function isOperationSignal(char: string, nextChar: string) {
+  return signals.has(char) && nextChar === " ";
+}
+
+function getValue(value: (string | number | ParsedOperation)): number {
+  if (Array.isArray(value)) {
+    return calculateTotal(value);
+  } else {
+    return value as number; 
+  }
 }
