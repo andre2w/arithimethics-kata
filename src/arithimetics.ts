@@ -13,12 +13,11 @@ const signals = new Set(["+", "-", "/", "*"]);
 const priorities = [["*", "/"], ["+", "-"]];
 
 export function calculate(operation: string): number {
-  const values = parse(operation, 0);
+  const values = parse(operation, 0)[0];
 
   if (values.length === 1) {
     return values[0] as number;
   }
-  
 
   return calculateTotal(values);
 }
@@ -51,37 +50,34 @@ function calculateTotalForSymbols(values: ParsedOperation, symbols: string[]) {
   }
 }
 
-function parse(operation: string, startingIndex: number) {
+function parse(operation: string, startingIndex: number): [ParsedOperation, number] {
   const values: ParsedOperation = [];
 
   let currentValue = "";
-
+    
   for (let i = startingIndex; i < operation.length; i++) {
     const char = operation.charAt(i);
 
     if (isOperationSignal(char, operation.charAt(i + 1))) {
       values.push(char);
     } else if (char === " ") {
-      pushValue(currentValue, values);
+      const value = parseInt(currentValue);
+      if (Number.isInteger(value)) {
+        values.push(value);
+      }
       currentValue = "";
     } else if (char !== "(" && char !== ")") {
       currentValue += char;
     } else if (char === "(" && i > startingIndex) {
       const parsed = parse(operation, i);
-      values.push(parsed)
+      values.push(parsed[0]);
+      i = parsed[1];
     } else if (char === ")") {
-      return values;
+      return [values, i];
     }
   }
 
-  return values;
-}
-
-function pushValue(currentValue: string, values: ParsedOperation) {
-  const value = parseInt(currentValue);
-  if (Number.isInteger(value)) {
-    values.push(value);
-  }
+  return [values, operation.length];
 }
 
 function isOperationSignal(char: string, nextChar: string) {

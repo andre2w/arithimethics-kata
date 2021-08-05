@@ -60,8 +60,9 @@ parametrisedTest("calculate result when operation has multiple numbers with diff
 
 parametrisedTest("calculate result when you have a nested operation", testCalculate,
   { input: "( 3 * ( 5 + 3 ) )", expected: 24 },
-  { input: "( 3 * ( 5 + 3 * ( 1 + 1 ) ) )", expected: 33 }
-
+  { input: "( 3 * ( 5 + 3 * ( 1 + 1 ) ) )", expected: 33 },
+  { input: "( ( 2 + 2 ) * ( 1 + 1 ) )", expected: 8 },
+  { input: "( 1 + ( ( 2 + 3 ) * ( 4 * 5 ) ) )", expected: 101 }
 );
 
 interface TestData<InputType, ExpectedType> {
