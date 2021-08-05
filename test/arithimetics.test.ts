@@ -1,15 +1,17 @@
 import test, { ExecutionContext }  from "ava";
 import { calculate } from "../src/arithimetics";
 
-test("parse a single number", assert => {
-  assert.is(calculate("( 1 )"), 1);
-});
-
 function testCalculate(assert: ExecutionContext, input: string, expected: number) {
   assert.is(calculate(input), expected);  
 }
 
 testCalculate.title = (title: string, input: string, expected: number) => `${title} ${input} ${expected}`;
+
+
+
+test("parse a single number", assert => {
+  assert.is(calculate("( 1 )"), 1);
+});
 
 parametrisedTest("parse sum operation", testCalculate, 
   { input: "( 1 + 1 )", expected: 2 },
@@ -64,7 +66,6 @@ parametrisedTest("calculate result when you have a nested operation", testCalcul
   { input: "( ( 2 + 2 ) * ( 1 + 1 ) )", expected: 8 },
   { input: "( 1 + ( ( 2 + 3 ) * ( 4 * 5 ) ) )", expected: 101 },
   { input: "( 5 ( 4 ( 3 ( 2 ( 1 * 9 ) / 8 - 7 ) + 6 ) ) )", expected: -165}
-
 );
 
 interface TestData<InputType, ExpectedType> {

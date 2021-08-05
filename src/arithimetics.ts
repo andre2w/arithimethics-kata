@@ -13,7 +13,7 @@ const signals = new Set(["+", "-", "/", "*"]);
 const priorities = [["*", "/"], ["+", "-"]];
 
 export function calculate(operation: string): number {
-  const values = parse(operation, 0).parsedOperation;
+  const values = parse(operation.split(" "), 0).parsedOperation;
 
   if (values.length === 1) {
     return values[0] as number;
@@ -55,47 +55,44 @@ interface ParseResult {
   endingIndex: number;
 }
 
-function parse(operation: string, startingIndex: number): ParseResult {
+function parse(operation: string[], startingIndex: number): ParseResult {
   const values: ParsedOperation = [];
 
-  let currentValue = "";
-    
   for (let i = startingIndex; i < operation.length; i++) {
-    const char = operation.charAt(i);
+    const char = operation[i];
 
-    if (isOperationSignal(char, operation.charAt(i + 1))) {
-      values.push(char);
-    } else if (char === " ") {
-      const value = parseInt(currentValue);
-      if (Number.isInteger(value)) {
-        values.push(value);
-      }
-      currentValue = "";
-    } else if (char !== "(" && char !== ")") {
-      currentValue += char;
-    } else if (char === "(" && i > startingIndex) {
+    if (char === "(" && i > startingIndex) {
       if (Number.isInteger(values[values.length - 1])) {
         values.push("*");
       }
       const parsed = parse(operation, i);
       values.push(parsed.parsedOperation);
+
+      // Jump to the end of nested parenthesis
       i = parsed.endingIndex;
-    } else if (char === ")") {
+    }  
+    
+    if (char === ")") {
       return { parsedOperation: values, endingIndex: i };
+    } 
+    
+    if (isNumberOrSignal(char)) {
+      const value = parseInt(char);
+      if (Number.isInteger(parseInt(char))) {
+        values.push(value);
+      } else if (signals.has(char)) {
+        values.push(char);
+      }
     }
   }
 
   return { parsedOperation: values, endingIndex: operation.length };
 }
 
-function isOperationSignal(char: string, nextChar: string) {
-  return signals.has(char) && nextChar === " ";
+function isNumberOrSignal(char: string) {
+  return signals.has(char) || Number.isInteger(parseInt(char));
 }
 
 function getValue(value: (string | number | ParsedOperation)): number {
-  if (Array.isArray(value)) {
-    return calculateTotal(value);
-  } else {
-    return value as number; 
-  }
+  return Array.isArray(value) ? calculateTotal(value) : value as number;
 }
