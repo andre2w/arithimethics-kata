@@ -13,7 +13,7 @@ const signals = new Set(["+", "-", "/", "*"]);
 const priorities = [["*", "/"], ["+", "-"]];
 
 export function calculate(operation: string): number {
-  const values = parse(operation, 0)[0];
+  const values = parse(operation, 0).parsedOperation;
 
   if (values.length === 1) {
     return values[0] as number;
@@ -50,7 +50,12 @@ function calculateTotalForSymbols(values: ParsedOperation, symbols: string[]) {
   }
 }
 
-function parse(operation: string, startingIndex: number): [ParsedOperation, number] {
+interface ParseResult {
+  parsedOperation: ParsedOperation;
+  endingIndex: number;
+}
+
+function parse(operation: string, startingIndex: number): ParseResult {
   const values: ParsedOperation = [];
 
   let currentValue = "";
@@ -73,14 +78,14 @@ function parse(operation: string, startingIndex: number): [ParsedOperation, numb
         values.push("*");
       }
       const parsed = parse(operation, i);
-      values.push(parsed[0]);
-      i = parsed[1];
+      values.push(parsed.parsedOperation);
+      i = parsed.endingIndex;
     } else if (char === ")") {
-      return [values, i];
+      return { parsedOperation: values, endingIndex: i };
     }
   }
 
-  return [values, operation.length];
+  return { parsedOperation: values, endingIndex: operation.length };
 }
 
 function isOperationSignal(char: string, nextChar: string) {
