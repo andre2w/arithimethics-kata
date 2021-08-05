@@ -62,7 +62,9 @@ parametrisedTest("calculate result when you have a nested operation", testCalcul
   { input: "( 3 * ( 5 + 3 ) )", expected: 24 },
   { input: "( 3 * ( 5 + 3 * ( 1 + 1 ) ) )", expected: 33 },
   { input: "( ( 2 + 2 ) * ( 1 + 1 ) )", expected: 8 },
-  { input: "( 1 + ( ( 2 + 3 ) * ( 4 * 5 ) ) )", expected: 101 }
+  { input: "( 1 + ( ( 2 + 3 ) * ( 4 * 5 ) ) )", expected: 101 },
+  { input: "( 5 ( 4 ( 3 ( 2 ( 1 * 9 ) / 8 - 7 ) + 6 ) ) )", expected: -165}
+
 );
 
 interface TestData<InputType, ExpectedType> {

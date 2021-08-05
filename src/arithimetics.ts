@@ -69,6 +69,9 @@ function parse(operation: string, startingIndex: number): [ParsedOperation, numb
     } else if (char !== "(" && char !== ")") {
       currentValue += char;
     } else if (char === "(" && i > startingIndex) {
+      if (Number.isInteger(values[values.length - 1])) {
+        values.push("*");
+      }
       const parsed = parse(operation, i);
       values.push(parsed[0]);
       i = parsed[1];
